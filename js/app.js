@@ -1,6 +1,9 @@
- 'use strict'
+ 'use strict';
  // create the module and name it scotchApp
-var scotchApp = angular.module('scotchApp',['ngRoute', 'ngFileUpload']);
+var scotchApp = angular.module('scotchApp',[
+    'ngRoute',
+     'ngFileUpload'
+    ]);
 // var scotchApp = angular.module('scotchApp', ['ngFileUpload']);
 
 // configure our routes
@@ -36,6 +39,10 @@ controller : 'cis400Controller'
 
 // create the controller and inject Angular's $scope
     scotchApp.controller('mainController', function($scope){
+        
+        $scope.loginBtn = function() {
+            
+        }
 //create a message to display in our view
 $scope.message = 'Welcome to the CIS Course Enrollment Center!';
 });
@@ -43,7 +50,22 @@ $scope.message = 'Welcome to the CIS Course Enrollment Center!';
 scotchApp.controller('homeController', function($scope){
 $scope.message = 'You have successfully logged in!';
 });
-    
+
+function run($rootScope, $http, $location, $localStorage) {
+    // keep user logged in after page refresh
+    if ($localStorage.currentUser) {
+        $http.defaults.headers.common.Authorization = 'Bearer ' + $localStorage.currentUser.token;
+    }
+
+    // redirect to login page if not logged in and trying to access a restricted page
+    $rootScope.$on('$locationChangeStart', function (event, next, current) {
+        var publicPages = ['/login'];
+        var restrictedPage = publicPages.indexOf($location.path()) === -1;
+        if (restrictedPage && !$localStorage.currentUser) {
+            $location.path('/login');
+        }
+    });
+}
 scotchApp.controller('loginController', function($scope, $location){
 
     $scope.records = [{name:'abc', id:123},{name:'hew', id:678}];
